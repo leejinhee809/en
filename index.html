@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>>_</title>
+    <!-- Web App & PWA Installation Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="engligh">
+    <meta name="theme-color" content="#4f46e5">
+
+    <!-- PWA Data URI Web App Manifest Injection -->
+    <script>
+        (function() {
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="512" height="512">
+                <rect width="500" height="500" rx="100" fill="#ffffff"/>
+                <g transform="translate(60, 20) scale(0.85)">
+                    <path d="M 130 50 L 310 50 C 340 50 360 70 360 100 L 360 380 C 360 410 340 430 310 430 L 130 430 C 100 430 80 410 80 380 L 80 100 C 80 70 100 50 130 50 Z" fill="none" stroke="#000" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="190" y1="80" x2="250" y2="80" stroke="#000" stroke-width="14" stroke-linecap="round"/>
+                    <circle cx="150" cy="80" r="8" fill="#000"/>
+                    <circle cx="290" cy="80" r="8" fill="#000"/>
+                    <line x1="220" y1="395" x2="260" y2="395" stroke="#000" stroke-width="12" stroke-linecap="round"/>
+                    <path d="M 140 160 L 180 130 M 140 160 L 180 190" fill="none" stroke="#000" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+                    <line x1="210" y1="200" x2="230" y2="120" stroke="#000" stroke-width="16" stroke-linecap="round"/>
+                    <path d="M 300 160 L 260 130 M 300 160 L 260 190" fill="none" stroke="#000" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+                    <rect x="140" y="225" width="100" height="40" fill="none" stroke="#000" stroke-width="12" rx="4"/>
+                    <line x1="140" y1="305" x2="270" y2="305" stroke="#000" stroke-width="14" stroke-linecap="round"/>
+                    <line x1="140" y1="345" x2="290" y2="345" stroke="#000" stroke-width="14" stroke-linecap="round"/>
+                    <g transform="translate(340, 230)">
+                        <circle cx="0" cy="0" r="55" fill="none" stroke="#000" stroke-width="14"/>
+                        <circle cx="0" cy="0" r="25" fill="none" stroke="#000" stroke-width="12"/>
+                        <path d="M0 -68 L0 -52 M0 52 L0 68 M-68 0 L-52 0 M52 0 L68 0 M-48 -48 L-36 -36 M36 36 L48 48 M-48 48 L-36 36 M36 -36 L48 -48" stroke="#000" stroke-width="14" stroke-linecap="round"/>
+                    </g>
+                </g>
+            </svg>`;
+            const svgUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svgIcon);
+
+            // Dynamically set favicon
+            const link = document.createElement('link');
+            link.rel = 'icon';
+            link.type = 'image/svg+xml';
+            link.href = svgUrl;
+            document.head.appendChild(link);
+
+            // Manifest JSON
+            const manifestObj = {
+                name: ">_",
+                short_name: ">_",
+                description: "개발자 영단어 및 캡처 문장 학습 PWA 앱",
+                start_url: "./index.html",
+                display: "standalone",
+                background_color: "#ffffff",
+                theme_color: "#4f46e5",
+                icons: [
+                    {
+                        src: svgUrl,
+                        sizes: "512x512",
+                        type: "image/svg+xml",
+                        purpose: "any maskable"
+                    }
+                ]
+            };
+            const manifestStr = "data:application/manifest+json;charset=utf-8," + encodeURIComponent(JSON.stringify(manifestObj));
+            const manifestLink = document.createElement('link');
+            manifestLink.rel = 'manifest';
+            manifestLink.href = manifestStr;
+            document.head.appendChild(manifestLink);
+        })();
+    </script>
+
+    <!-- PWA Offline Manifest & Service Worker Script Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'devvocab-offline-v1';
+                    self.addEventListener('install', (e) => {
+                        e.waitUntil(
+                            caches.open(CACHE_NAME).then((cache) => {
+                                return cache.addAll(['./']);
+                            })
+                        );
+                        self.skipWaiting();
+                    });
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            caches.match(e.request).then((response) => {
+                                return response || fetch(e.request).catch(() => caches.match('./'));
+                            })
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch(err => console.log('SW reg error:', err));
+            });
+        }
+    </script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Tone.js for Sound Effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pulse-mic {
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            animation: pulse-ring 1.5s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+        @keyframes pulse-ring {
+            to {
+                box-shadow: 0 0 0 16px rgba(239, 68, 68, 0);
+            }
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col justify-between select-none">
+
+    <!-- Top Header -->
+    <header class="bg-gradient-to-r from-brand-700 to-brand-600 text-white px-4 py-3 shadow-md sticky top-0 z-30">
+        <div class="max-w-md mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <!-- App Icon SVG matching user image -->
+                <div class="w-9 h-9 bg-white rounded-xl p-1 shadow-sm flex items-center justify-center shrink-0">
+                    <svg viewBox="0 0 500 500" class="w-full h-full">
+                        <g transform="translate(60, 20) scale(0.85)">
+                            <path d="M 130 50 L 310 50 C 340 50 360 70 360 100 L 360 380 C 360 410 340 430 310 430 L 130 430 C 100 430 80 410 80 380 L 80 100 C 80 70 100 50 130 50 Z" fill="none" stroke="#000" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="190" y1="80" x2="250" y2="80" stroke="#000" stroke-width="14" stroke-linecap="round"/>
+                            <circle cx="150" cy="80" r="8" fill="#000"/>
+                            <circle cx="290" cy="80" r="8" fill="#000"/>
+                            <line x1="220" y1="395" x2="260" y2="395" stroke="#000" stroke-width="14" stroke-linecap="round"/>
+                            <path d="M 140 160 L 180 130 M 140 160 L 180 190" fill="none" stroke="#000" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="210" y1="200" x2="230" y2="120" stroke="#000" stroke-width="18" stroke-linecap="round"/>
+                            <path d="M 300 160 L 260 130 M 300 160 L 260 190" fill="none" stroke="#000" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+                            <rect x="140" y="225" width="100" height="40" fill="none" stroke="#000" stroke-width="14" rx="4"/>
+                            <line x1="140" y1="305" x2="270" y2="305" stroke="#000" stroke-width="16" stroke-linecap="round"/>
+                            <line x1="140" y1="345" x2="290" y2="345" stroke="#000" stroke-width="16" stroke-linecap="round"/>
+                            <g transform="translate(340, 230)">
+                                <circle cx="0" cy="0" r="55" fill="none" stroke="#000" stroke-width="16"/>
+                                <circle cx="0" cy="0" r="25" fill="none" stroke="#000" stroke-width="14"/>
+                                <path d="M0 -68 L0 -52 M0 52 L0 68 M-68 0 L-52 0 M52 0 L68 0 M-48 -48 L-36 -36 M36 36 L48 48 M-48 48 L-36 36 M36 -36 L48 -48" stroke="#000" stroke-width="16" stroke-linecap="round"/>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight">>_</h1>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 bg-brand-700/50 px-2.5 py-1 rounded-full border border-white/10">
+                <i data-lucide="flame" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+                <span id="streakCount" class="text-xs font-semibold">0일 연속</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-md w-full mx-auto p-4 pb-24">
+
+        <!-- TAB 1: VOCABULARY LIST -->
+        <section id="tab-vocab" class="space-y-4">
+            <!-- Daily 30 Words Mission Card -->
+            <div class="bg-gradient-to-r from-brand-600 to-indigo-600 rounded-2xl p-4 text-white shadow-md space-y-2 relative overflow-hidden">
+                <div class="flex justify-between items-center relative z-10">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="target" class="w-5 h-5 text-amber-300"></i>
+                        <h3 class="font-bold text-sm">오늘의 미션: 하루 30개 마스터!</h3>
+                    </div>
+                    <span id="missionBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md">
+                        0 / 30개
+                    </span>
+                </div>
+                <p class="text-xs text-brand-100 relative z-10 leading-relaxed">
+                    오늘 암기한 단어/문장의 소리를 🔊 듣고 퀴즈를 풀어 목표 30개를 달성하세요.
+                </p>
+                <div class="w-full bg-white/20 rounded-full h-2 overflow-hidden relative z-10">
+                    <div id="missionProgressFill" class="bg-amber-300 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-1.5">
+                    <i data-lucide="book-open" class="w-5 h-5 text-brand-600"></i>
+                    메뉴 단어장
+                </h2>
+                <div class="flex items-center space-x-1.5">
+                    <button onclick="openBackupRestoreModal()" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-xs font-medium transition active:scale-95 flex items-center gap-1" title="백업/복구">
+                        <i data-lucide="database" class="w-3.5 h-3.5"></i>
+                        <span>백업/복구</span>
+                    </button>
+                    <button onclick="openAddWordModal()" class="flex items-center gap-1 px-2.5 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-semibold shadow-sm transition active:scale-95">
+                        <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                        <span>단어 추가</span>
+                    </button>
+                    <span id="vocabCountBadge" class="text-xs font-semibold px-2 py-0.5 bg-brand-50 text-brand-700 rounded-full border border-brand-100">
+                        전체 0개
+                    </span>
+                </div>
+            </div>
+
+            <!-- Site Filter Buttons -->
+            <div class="flex space-x-2 overflow-x-auto no-scrollbar py-1">
+                <button onclick="filterWords('all')" class="filter-btn active transition-all px-3.5 py-1.5 rounded-full text-xs font-medium bg-brand-600 text-white shadow-sm whitespace-nowrap">전체</button>
+                <button onclick="filterWords('Google Flow')" class="filter-btn transition-all px-3.5 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 whitespace-nowrap">Google Flow</button>
+                <button onclick="filterWords('GitHub')" class="filter-btn transition-all px-3.5 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 whitespace-nowrap">GitHub</button>
+                <button onclick="filterWords('Netlify')" class="filter-btn transition-all px-3.5 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 whitespace-nowrap">Netlify</button>
+                <button onclick="filterWords('Vercel')" class="filter-btn transition-all px-3.5 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 whitespace-nowrap">Vercel</button>
+            </div>
+
+            <!-- Word Search Box -->
+            <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="단어 또는 뜻 검색..." 
+                       class="w-full pl-9 pr-4 py-2 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 shadow-sm transition">
+            </div>
+
+            <!-- Word Cards List -->
+            <div id="wordListContainer" class="space-y-2.5">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- TAB 2: GAME & VOICE TEST -->
+        <section id="tab-game" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-1.5">
+                    <i data-lucide="gamepad-2" class="w-5 h-5 text-brand-600"></i>
+                    암기 & 발음 퀴즈
+                </h2>
+                <div class="flex items-center space-x-2 text-xs font-semibold">
+                    <span class="text-brand-600 bg-brand-50 px-2 py-1 rounded-md border border-brand-100">
+                        남은 학습: <span id="remainingQuizCount">0</span>개
+                    </span>
+                    <span class="text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 flex items-center gap-1">
+                        <i data-lucide="trophy" class="w-3.5 h-3.5"></i>
+                        <span id="gameScore">0</span>점
+                    </span>
+                </div>
+            </div>
+
+            <!-- Game Sub-mode Selector -->
+            <div class="grid grid-cols-2 gap-2 bg-slate-200 p-1 rounded-xl">
+                <button id="modeMeaningBtn" onclick="switchGameMode('meaning')" 
+                        class="py-2 text-xs font-bold rounded-lg transition-all bg-white text-brand-700 shadow-sm flex justify-center items-center gap-1">
+                    <i data-lucide="help-circle" class="w-4 h-4"></i>
+                    뜻 맞추기 퀴즈
+                </button>
+                <button id="modeVoiceBtn" onclick="switchGameMode('voice')" 
+                        class="py-2 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex justify-center items-center gap-1">
+                    <i data-lucide="mic" class="w-4 h-4"></i>
+                    발음 테스트
+                </button>
+            </div>
+
+            <!-- 4-Choice Quiz Container -->
+            <div id="meaningGameSection" class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
+                <div class="flex justify-between items-center">
+                    <span id="quizSiteBadge" class="text-[11px] font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-1 rounded-md border border-brand-100">
+                        Site
+                    </span>
+                    <button onclick="playQuizWordTTS()" class="flex items-center gap-1 text-xs text-slate-500 hover:text-brand-600 bg-slate-100 hover:bg-brand-50 px-2.5 py-1 rounded-lg transition">
+                        <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+                        <span>발음 듣기</span>
+                    </button>
+                </div>
+
+                <div class="text-center py-4">
+                    <h3 id="quizWordTerm" class="text-xl font-black text-slate-900 tracking-tight">Term</h3>
+                    <p class="text-xs text-slate-400 mt-1">이 메뉴 단어의 올바른 한국어 뜻은 무엇일까요?</p>
+                </div>
+
+                <div id="quizOptionsContainer" class="grid grid-cols-1 gap-2.5">
+                    <!-- Dynamic Buttons -->
+                </div>
+            </div>
+
+            <!-- Speech Recognition Voice Test Container -->
+            <div id="voiceGameSection" class="hidden bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm text-center space-y-4">
+                <span id="voiceSiteBadge" class="inline-block text-[11px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">
+                    Google Flow
+                </span>
+                
+                <div>
+                    <h3 id="voiceTargetWord" class="text-xl font-black text-slate-900 tracking-tight">Repository</h3>
+                    <p class="text-xs text-slate-500 mt-1">마이크를 누르고 위 영단어/문장을 정확하게 읽어보세요!</p>
+                </div>
+
+                <div class="flex justify-center py-2">
+                    <button id="micBtn" onclick="toggleSpeechRecognition()" 
+                            class="w-16 h-16 rounded-full bg-brand-600 text-white flex items-center justify-center shadow-lg hover:bg-brand-700 active:scale-95 transition-all">
+                        <i data-lucide="mic" class="w-7 h-7"></i>
+                    </button>
+                </div>
+
+                <div id="voiceStatusBox" class="p-3 rounded-xl bg-slate-50 border border-slate-100 min-h-[70px] flex flex-col justify-center items-center">
+                    <p id="speechResultText" class="text-sm font-semibold text-slate-600">준비 완료. 마이크를 클릭하세요.</p>
+                    <p id="speechRecognizedWord" class="text-xs text-slate-400 mt-0.5"></p>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button onclick="playVoiceTargetTTS()" class="text-xs text-slate-500 hover:text-brand-600 flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg transition">
+                        <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+                        정답 발음 듣기
+                    </button>
+                    <button onclick="loadVoiceQuizWord()" class="text-xs text-brand-600 font-medium hover:underline flex items-center gap-1">
+                        다음 단어
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: CALENDAR & GOALS -->
+        <section id="tab-calendar" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-900 flex items-center gap-1.5">
+                    <i data-lucide="calendar" class="w-5 h-5 text-brand-600"></i>
+                    학습 목표 & 캘린더
+                </h2>
+                <span class="text-xs text-slate-500">일일 목표: 단어 5개 이상 학습</span>
+            </div>
+
+            <!-- Calendar Card -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm">
+                <!-- Month Nav -->
+                <div class="flex items-center justify-between mb-4 px-1">
+                    <h3 id="calendarMonthTitle" class="font-bold text-slate-800 text-base">2026년 11월</h3>
+                    <div class="flex space-x-1">
+                        <button onclick="changeMonth(-1)" class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="changeMonth(1)" class="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calendar Days Header & Grid -->
+                <div class="grid grid-cols-7 gap-1 text-center mb-1">
+                    <span class="text-xs font-semibold text-rose-500 py-1">일</span>
+                    <span class="text-xs font-semibold text-slate-400 py-1">월</span>
+                    <span class="text-xs font-semibold text-slate-400 py-1">화</span>
+                    <span class="text-xs font-semibold text-slate-400 py-1">수</span>
+                    <span class="text-xs font-semibold text-slate-400 py-1">목</span>
+                    <span class="text-xs font-semibold text-slate-400 py-1">금</span>
+                    <span class="text-xs font-semibold text-blue-500 py-1">토</span>
+                </div>
+                <div id="calendarGrid" class="grid grid-cols-7 gap-1 text-center">
+                    <!-- Grid Days dynamically injected -->
+                </div>
+            </div>
+
+            <!-- Daily Target Progress Card -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm space-y-3">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span id="selectedDateLabel" class="text-xs font-bold text-brand-600 uppercase tracking-wider">오늘의 학습</span>
+                        <h4 id="selectedDateTitle" class="text-base font-bold text-slate-900 mt-0.5">2026년 11월 5일</h4>
+                    </div>
+                    <span id="goalBadge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                        진행 중 ⏳
+                    </span>
+                </div>
+
+                <div>
+                    <div class="flex justify-between text-xs text-slate-500 mb-1">
+                        <span>목표 달성률</span>
+                        <span id="goalPercentText" class="font-bold text-slate-700">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div id="dailyProgressFill" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="pt-1">
+                    <button id="toggleGoalBtn" onclick="toggleDateGoal()" 
+                            class="w-full py-2.5 rounded-xl font-bold text-sm bg-brand-600 hover:bg-brand-700 text-white shadow-sm transition active:scale-[0.99] flex justify-center items-center gap-2">
+                        <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                        오늘 목표 달성 완료 체크
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-30 px-4 py-2 shadow-lg">
+        <div class="max-w-md mx-auto grid grid-cols-3 gap-1">
+            <button onclick="switchTab('vocab')" id="nav-vocab" class="nav-btn active flex flex-col items-center justify-center py-1.5 text-brand-600 font-semibold transition">
+                <i data-lucide="book-open" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[11px]">단어장</span>
+            </button>
+            <button onclick="switchTab('game')" id="nav-game" class="nav-btn flex flex-col items-center justify-center py-1.5 text-slate-400 hover:text-slate-600 font-medium transition">
+                <i data-lucide="gamepad-2" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[11px]">암기/발음</span>
+            </button>
+            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-btn flex flex-col items-center justify-center py-1.5 text-slate-400 hover:text-slate-600 font-medium transition">
+                <i data-lucide="calendar" class="w-5 h-5 mb-0.5"></i>
+                <span class="text-[11px]">캘린더</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Custom Word Add Modal -->
+    <div id="addWordModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-xl border border-slate-100 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-slate-900 flex items-center gap-1.5 text-base">
+                    <i data-lucide="plus-square" class="w-5 h-5 text-brand-600"></i>
+                    단어 추가 / 사진 캡처 업로드
+                </h3>
+                <button onclick="closeAddWordModal()" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Image Capture / OCR Upload Section -->
+            <div class="bg-brand-50 border border-brand-200 p-3.5 rounded-xl space-y-2">
+                <div class="flex items-center gap-1.5 text-xs font-bold text-brand-700">
+                    <i data-lucide="sparkles" class="w-4 h-4 text-amber-500"></i>
+                    <span>AI 캡처 사진으로 단어/문장 자동 추출</span>
+                </div>
+                <p class="text-[11px] text-slate-600 leading-relaxed">
+                    모르는 사이트 캡처 사진을 올리면 AI가 모든 영단어와 긴 문장 전체를 자동으로 분석하여 등록합니다.
+                </p>
+                <label class="w-full py-2.5 px-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-[0.99]">
+                    <i data-lucide="camera" class="w-4 h-4"></i>
+                    <span>캡처 이미지 선택하기</span>
+                    <input type="file" id="imageCaptureInput" accept="image/*" onchange="handleImageCaptureUpload(event)" class="hidden">
+                </label>
+                <div id="aiStatusBox" class="hidden text-xs font-semibold text-brand-700 text-center py-1"></div>
+            </div>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink mx-2 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">또는 직접 입력</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            <!-- Manual Add Form -->
+            <form onsubmit="handleWordSubmit(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">사이트 분류</label>
+                    <select id="newWordSite" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500">
+                        <option value="Google Flow">Google Flow</option>
+                        <option value="GitHub" selected>GitHub</option>
+                        <option value="Netlify">Netlify</option>
+                        <option value="Vercel">Vercel</option>
+                        <option value="기타">기타 사이트</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">영어 단어 및 문장</label>
+                    <input type="text" id="newWordTerm" placeholder="예: Pull Request 또는 Complete your profile" required
+                           class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">한국어 뜻</label>
+                    <input type="text" id="newWordMeaning" placeholder="예: 코드 반영 요청" required
+                           class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">상세 설명 (선택)</label>
+                    <textarea id="newWordDesc" rows="2" placeholder="기능에 대한 추가 설명을 입력하세요."
+                              class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 resize-none"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-sm transition active:scale-[0.99]">
+                    단어 추가하기
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Backup & Restore Modal -->
+    <div id="backupModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl p-5 max-w-sm w-full space-y-4 shadow-xl border border-slate-100">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-slate-900 flex items-center gap-1.5 text-base">
+                    <i data-lucide="database" class="w-5 h-5 text-brand-600"></i>
+                    데이터 백업 & 복구
+                </h3>
+                <button onclick="closeBackupRestoreModal()" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-500 leading-relaxed">
+                인터넷 데이터 삭제 시에도 내 단어장과 캘린더 기록이 지워지지 않도록 파일로 저장하거나 다시 불러올 수 있습니다.
+            </p>
+
+            <div class="space-y-2 pt-1">
+                <button onclick="exportDataBackup()" class="w-full py-2.5 px-3 bg-brand-50 border border-brand-200 hover:bg-brand-100 text-brand-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span>단어장 백업 파일 다운로드 (.json)</span>
+                </button>
+
+                <label class="w-full py-2.5 px-3 bg-slate-50 border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer">
+                    <i data-lucide="upload" class="w-4 h-4"></i>
+                    <span>백업 파일 선택해서 복구하기</span>
+                    <input type="file" id="restoreFileInput" accept=".json" onchange="importDataBackup(event)" class="hidden">
+                </label>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+                <button onclick="closeBackupRestoreModal()" class="py-2 px-4 rounded-xl border border-slate-200 text-slate-600 font-semibold text-xs hover:bg-slate-50">닫기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-[-10px]">
+        <div id="toastContent" class="bg-slate-900/90 text-white backdrop-blur-md px-4 py-2.5 rounded-full text-xs font-medium shadow-xl flex items-center gap-2">
+            <i data-lucide="info" class="w-4 h-4 text-brand-500"></i>
+            <span id="toastMessage">메시지</span>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Code -->
+    <script>
+        // Database of developer terms & extracted sentences grouped by platforms
+        const defaultDevVocabulary = [
+            // Extracted GitHub Sentences & Terms
+            { id: 101, site: "GitHub", term: "Create your first code project", meaning: "첫 번째 코드 프로젝트 생성하기", desc: "새로운 개발 프로젝트를 처음으로 만들 때 클릭하는 버튼/문구입니다." },
+            { id: 102, site: "GitHub", term: "Start a Copilot chat", meaning: "Copilot 대화 시작하기", desc: "AI 도우미인 Copilot과 대화를 시작하여 도움을 받는 메뉴입니다." },
+            { id: 103, site: "GitHub", term: "Ask Copilot questions about coding or GitHub and get instant help with your first project.", meaning: "코딩이나 GitHub에 대해 질문하고 첫 프로젝트 도움을 즉시 받아보세요.", desc: "GitHub Copilot의 기능과 사용 방법을 설명하는 대표 안내 문구입니다." },
+            { id: 104, site: "GitHub", term: "Start chat", meaning: "채팅 시작하기", desc: "대화창을 열어 질문을 시작하는 실행 버튼입니다." },
+            { id: 105, site: "GitHub", term: "Complete your profile", meaning: "프로필 완성하기", desc: "사용자의 계정 정보를 모두 작성하도록 안내하는 섹션입니다." },
+            { id: 106, site: "GitHub", term: "Start with GitHub Docs", meaning: "GitHub 공식 문서로 시작하기", desc: "사용법 가이드 문서를 찾아볼 수 있는 안내 타이틀입니다." },
+            { id: 107, site: "GitHub", term: "GitHub Documentation", meaning: "GitHub 공식 문서 / 설명서", desc: "모든 기능에 대한 상세 설명 및 튜토리얼 모음입니다." },
+            { id: 108, site: "GitHub", term: "Help for wherever you are on your journey", meaning: "개발 여정의 어떤 단계에 있든 도움을 드립니다", desc: "초보자부터 전문가까지 단계별 도움말을 제공한다는 설명입니다." },
+            { id: 109, site: "GitHub", term: "About GitHub and Git", meaning: "GitHub과 Git에 대하여", desc: "Git 버전 관리와 GitHub 서비스 기초를 배우는 안내 문서입니다." },
+            { id: 110, site: "GitHub", term: "How to create your first repository", meaning: "첫 번째 저장소(리포지토리) 만드는 방법", desc: "첫 코드 저장소를 생성하는 가이드 문서 링크입니다." },
+            { id: 111, site: "GitHub", term: "Creating a pull request", meaning: "풀 리퀘스트(PR) 생성하기", desc: "코드 변경 사항 반영을 요청하는 PR 생성 가이드입니다." },
+            { id: 112, site: "GitHub", term: "What is GitHub Copilot?", meaning: "GitHub Copilot이란 무엇인가요?", desc: "AI 코드 어시스턴트에 대해 설명하는 기초 문서입니다." },
+            { id: 113, site: "GitHub", term: "GitHub flow", meaning: "GitHub 작업 흐름 / 절차", desc: "브랜치 생성부터 PR, 머지까지의 표준 협업 흐름입니다." },
+            { id: 114, site: "GitHub", term: "Hello World exercise", meaning: "Hello World 기초 실습", desc: "가장 기본적인 첫 튜토리얼 연습 과제입니다." },
+            { id: 115, site: "GitHub", term: "Copilot Chat Cookbook", meaning: "Copilot 채팅 활용 가이드북", desc: "Copilot 프롬프트 및 활용 예시 모음 가이드입니다." },
+            { id: 116, site: "GitHub", term: "Recommendations", meaning: "추천 사항 / 추천 도구", desc: "사용자에게 유용한 소프트웨어나 도구를 추천해 주는 섹션입니다." },
+            { id: 117, site: "GitHub", term: "Download Visual Studio with Copilot", meaning: "Copilot이 포함된 Visual Studio 다운로드", desc: "개발 에디터인 VS Code/Visual Studio 다운로드 추천 카드입니다." },
+            { id: 118, site: "GitHub", term: "Chat with Copilot to build your first website, troubleshoot your code, or guide you through your GitHub journey.", meaning: "Copilot과 대화하며 첫 웹사이트를 만들고 코드를 해결하며 GitHub 여정을 안내받으세요.", desc: "Copilot 에디터 연동 시 얻을 수 있는 이점을 설명하는 문장입니다." },
+            { id: 119, site: "GitHub", term: "Download GitHub for Desktop", meaning: "GitHub 데스크톱 앱 다운로드", desc: "명령어 없이 클릭만으로 GitHub을 쓰는 전용 PC 프로그램 설치 링크입니다." },
+
+            // Google Flow
+            { id: 1, site: "Google Flow", term: "Dashboard", meaning: "대시보드 (핵심 현황판)", desc: "프로젝트 진행상황 및 노드 실행 현황을 한눈에 파악하는 메인 화면입니다." },
+            { id: 2, site: "Google Flow", term: "Workflows", meaning: "워크플로우 (작업 흐름 설정)", desc: "자동화된 작업 단계들을 순서대로 연결해놓은 전체 프로세스입니다." },
+            { id: 3, site: "Google Flow", term: "Pipelines", meaning: "파이프라인 (데이터 처리 경로)", desc: "데이터나 코드 작업이 연속적으로 처리되는 파이프라인 통로입니다." },
+            { id: 4, site: "Google Flow", term: "Deploy", meaning: "배포하다 (실행 환경 반영)", desc: "개발된 서비스를 실제 운영 서버 및 클라우드 환경에 올리는 작업입니다." },
+            { id: 5, site: "Google Flow", term: "Execution", meaning: "실행 / 처리 단계", desc: "지정된 프로세스 및 태스크가 실제로 동작하는 실행 상태입니다." },
+            { id: 6, site: "Google Flow", term: "Artifacts", meaning: "산출물 / 결과 파일", desc: "빌드 및 실행 과정에서 최종 생성되는 아티팩트 결과물입니다." },
+
+            // GitHub Terms
+            { id: 7, site: "GitHub", term: "Repository", meaning: "저장소 (리포지토리)", desc: "프로젝트의 소스코드와 파일 변경 이력이 저장되는 공간입니다." },
+            { id: 8, site: "GitHub", term: "Pull Request", meaning: "풀 리퀘스트 (코드 반영 요청)", desc: "내가 작업한 브랜치의 코드를 메인 코드베이스에 합쳐달라고 검토 요청합니다." },
+            { id: 9, site: "GitHub", term: "Commit", meaning: "커밋 (변경사항 기록)", desc: "코드 수정 내역에 대한 스냅샷을 메시지와 함께 저장하는 단위입니다." },
+            { id: 10, site: "GitHub", term: "Branch", meaning: "브랜치 (독립 작업 공간)", desc: "기존 코드와 독립되어 새로운 기능을 개발할 수 있는 분기선입니다." },
+            { id: 11, site: "GitHub", term: "Issues", meaning: "이슈 (버그 및 할 일 관리)", desc: "버그 제보, 기능 개선 작업, 토론 등 할 일을 등록하고 관리합니다." },
+            { id: 12, site: "GitHub", term: "Merge", meaning: "머지 (코드 병합)", desc: "서로 다른 브랜치의 수정사항을 하나로 통합하는 작업입니다." },
+            { id: 13, site: "GitHub", term: "Fork", meaning: "포크 (저장소 복사)", desc: "타인의 원본 저장소를 나의 개인 GitHub 계정으로 복사해옵니다." },
+            { id: 14, site: "GitHub", term: "Actions", meaning: "액션스 (자동화 CI/CD)", desc: "빌드, 테스트, 배포 등 소프트웨어 워크플로우를 자동화하는 서비스입니다." },
+
+            // Netlify
+            { id: 15, site: "Netlify", term: "Sites", meaning: "사이트 목록", desc: "Netlify에 연결되어 배포되고 있는 웹 호스팅 프로젝트 목록입니다." },
+            { id: 16, site: "Netlify", term: "Deploys", meaning: "배포 내역 및 로그", desc: "소스 코드가 빌드되어 서버로 배포된 히스토리와 로그입니다." },
+            { id: 17, site: "Netlify", term: "Domain settings", meaning: "도메인 설정", desc: "커스텀 웹사이트 주소(DNS) 및 SSL 보안 인증서를 관리합니다." },
+            { id: 18, site: "Netlify", term: "Environment variables", meaning: "환경 변수", desc: "API 키, 데이터베이스 암호 등 보안이 필요한 글로벌 설정값입니다." },
+            { id: 19, site: "Netlify", term: "Forms", meaning: "폼 수신함", desc: "웹사이트 방문자가 작성하여 제출한 입력 데이터를 자동으로 수집합니다." },
+            { id: 20, site: "Netlify", term: "Functions", meaning: "서버리스 함수", desc: "별도의 서버 구축 없이 백엔드 코드 조각을 실행하는 클라우드 함수입니다." },
+
+            // Vercel
+            { id: 21, site: "Vercel", term: "Overview", meaning: "개요 / 요약", desc: "프로젝트 전반의 배포 상태, 주소, 분석 정보를 요약해서 보여줍니다." },
+            { id: 22, site: "Vercel", term: "Integrations", meaning: "외부 도구 연동", desc: "데이터베이스, 분석 도구 등 제3자 SaaS 서비스와 통합 연결합니다." },
+            { id: 23, site: "Vercel", term: "Analytics", meaning: "웹로그 분석", desc: "방문자 수, 로딩 속도, 성능 트래픽 지표를 시각화하여 확인합니다." },
+            { id: 24, site: "Vercel", term: "Logs", meaning: "서버 런타임 로그", desc: "실시간 서버 요청 처리 내역과 에러 발생 기록을 확인합니다." }
+        ];
+
+        // Load custom vocabulary from localStorage or initialize defaults
+        let devVocabulary = JSON.parse(localStorage.getItem('devvocab_custom_words')) || defaultDevVocabulary;
+
+        // State Management
+        let currentTab = 'vocab';
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let gameScore = 0;
+        let currentQuiz = null;
+        let voiceTarget = null;
+        let recognition = null;
+        let isListening = false;
+        let currentGameMode = 'meaning';
+        
+        // Unseen Decks for 100% full coverage cycling
+        let remainingMeaningDeck = [];
+        let remainingVoiceDeck = [];
+
+        // Calendar & Progress state
+        let calendarCurrentDate = new Date();
+        let selectedDateStr = getFormattedDateStr(new Date());
+        let completedDates = JSON.parse(localStorage.getItem('devvocab_completed_dates') || '{}');
+
+        // Sound Effects via Tone.js
+        const synth = new Tone.Synth().toDestination();
+        function playSound(type) {
+            try {
+                if (Tone.context && Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                if (type === 'correct') {
+                    synth.triggerAttackRelease("C5", "8n", Tone.now());
+                    synth.triggerAttackRelease("E5", "8n", Tone.now() + 0.1);
+                    synth.triggerAttackRelease("G5", "8n", Tone.now() + 0.2);
+                } else if (type === 'wrong') {
+                    synth.triggerAttackRelease("F3", "8n", Tone.now());
+                    synth.triggerAttackRelease("C3", "8n", Tone.now() + 0.15);
+                } else if (type === 'click') {
+                    synth.triggerAttackRelease("C4", "16n", Tone.now());
+                } else if (type === 'complete') {
+                    synth.triggerAttackRelease("G4", "8n", Tone.now());
+                    synth.triggerAttackRelease("C5", "8n", Tone.now() + 0.15);
+                    synth.triggerAttackRelease("E5", "4n", Tone.now() + 0.3);
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        // Initialize Window
+        window.onload = function() {
+            lucide.createIcons();
+            renderVocabList();
+            renderCalendar();
+            updateStreakDisplay();
+            updateDailyMissionProgress();
+            initSpeechRecognition();
+        };
+
+        // Utility: Toast Notification
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = msg;
+            toast.classList.remove('opacity-0', 'translate-y-[-10px]');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-[-10px]');
+            }, 3000);
+        }
+
+        // Utility: Date String
+        function getFormattedDateStr(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        // --- TTS Text to Speech ---
+        function speakTTS(text) {
+            trackMissionProgress();
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                showToast("음성 출력을 지원하지 않는 브라우저입니다.");
+            }
+        }
+
+        // --- NAVIGATION TABS ---
+        function switchTab(tabId) {
+            playSound('click');
+            currentTab = tabId;
+
+            document.getElementById('tab-vocab').classList.add('hidden');
+            document.getElementById('tab-game').classList.add('hidden');
+            document.getElementById('tab-calendar').classList.add('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-brand-600', 'font-semibold');
+                btn.classList.add('text-slate-400', 'font-medium');
+            });
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            const activeNavBtn = document.getElementById('nav-' + tabId);
+            activeNavBtn.classList.remove('text-slate-400', 'font-medium');
+            activeNavBtn.classList.add('text-brand-600', 'font-semibold');
+
+            if (tabId === 'game') {
+                loadMeaningQuiz();
+                loadVoiceQuizWord();
+            } else if (tabId === 'calendar') {
+                renderCalendar();
+            }
+        }
+
+        // --- TAB 1: VOCABULARY LIST LOGIC ---
+        function filterWords(site) {
+            playSound('click');
+            currentFilter = site;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if((site === 'all' && btn.textContent === '전체') || btn.textContent === site) {
+                    btn.className = "filter-btn transition-all px-3.5 py-1.5 rounded-full text-xs font-medium bg-brand-600 text-white shadow-sm whitespace-nowrap";
+                } else {
+                    btn.className = "filter-btn transition-all px-3.5 py-1.5 rounded-full text-xs font-medium bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 whitespace-nowrap";
+                }
+            });
+
+            renderVocabList();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            renderVocabList();
+        }
+
+        function renderVocabList() {
+            const container = document.getElementById('wordListContainer');
+            container.innerHTML = '';
+
+            const filtered = devVocabulary.filter(item => {
+                const matchesSite = (currentFilter === 'all') || (item.site === currentFilter);
+                const matchesSearch = item.term.toLowerCase().includes(searchQuery) || item.meaning.toLowerCase().includes(searchQuery);
+                return matchesSite && matchesSearch;
+            });
+
+            document.getElementById('vocabCountBadge').textContent = `${currentFilter === 'all' ? '전체' : currentFilter} ${filtered.length}개`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 bg-white rounded-2xl border border-slate-200/80">
+                        <i data-lucide="search-x" class="w-8 h-8 text-slate-300 mx-auto mb-2"></i>
+                        <p class="text-sm font-semibold text-slate-500">검색 조건에 맞는 단어가 없습니다.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            filtered.forEach(item => {
+                let badgeStyle = "bg-brand-50 text-brand-700 border-brand-100";
+                if(item.site === 'GitHub') badgeStyle = "bg-slate-100 text-slate-800 border-slate-200";
+                if(item.site === 'Netlify') badgeStyle = "bg-teal-50 text-teal-700 border-teal-100";
+                if(item.site === 'Vercel') badgeStyle = "bg-neutral-900 text-white border-black";
+                if(item.site === '기타' || item.site === '캡처 추출') badgeStyle = "bg-purple-50 text-purple-700 border-purple-100";
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm hover:shadow-md transition space-y-2 relative";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md border ${badgeStyle}">
+                                ${item.site}
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="speakTTS('${item.term.replace(/'/g, "\\'")}')" class="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-brand-600 rounded-lg transition" title="발음 듣기">
+                                <i data-lucide="volume-2" class="w-4 h-4"></i>
+                            </button>
+                            ${item.isCustom ? `
+                                <button onclick="deleteCustomWord(event, ${item.id})" class="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition" title="삭제">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base leading-snug">${item.term}</h3>
+                        <p class="text-sm font-medium text-brand-600 mt-0.5">${item.meaning}</p>
+                    </div>
+                    ${item.desc ? `<p class="text-xs text-slate-500 leading-relaxed bg-slate-50 p-2 rounded-lg border border-slate-100">${item.desc}</p>` : ''}
+                `;
+                container.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        function openAddWordModal() {
+            playSound('click');
+            document.getElementById('addWordModal').classList.remove('hidden');
+        }
+
+        function closeAddWordModal() {
+            document.getElementById('addWordModal').classList.add('hidden');
+        }
+
+        // Helper: Convert File to Base64 & Resize via Canvas for maximum reliability
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 1200;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    resolve(dataUrl.split(',')[1]);
+                };
+                img.onerror = (err) => reject(err);
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        // Handle Image Capture Upload & High-Precision Gemini AI Parsing
+        async function handleImageCaptureUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const statusBox = document.getElementById('aiStatusBox');
+            if (statusBox) {
+                statusBox.textContent = "📷 이미지를 정밀 분석 중입니다 (AI 요청 중)...";
+                statusBox.classList.remove('hidden');
+            }
+            showToast("✨ Google Gemini AI가 이미지 속 영문 및 문장을 정밀 분석 중...");
+            playSound('click');
+
+            try {
+                const base64ImageData = await fileToBase64(file);
+                
+                const systemPrompt = "You are a helpful language assistant for software developers. Analyze the captured UI screenshot and extract ALL English sentences, interface titles, instructions, and individual technical words. Translate each into natural Korean and provide a concise Korean explanation. Output ONLY a JSON array of objects with the exact schema: [{\"term\": string, \"meaning\": string, \"desc\": string}]";
+                const userPrompt = "Extract all English text (both full sentences and words) from this screenshot. Return a JSON array with term (English text), meaning (Korean translation), and desc (short explanation in Korean).";
+
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [
+                        {
+                            role: "user",
+                            parts: [
+                                { text: userPrompt },
+                                {
+                                    inlineData: {
+                                        mimeType: "image/jpeg",
+                                        data: base64ImageData
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: {
+                            type: "ARRAY",
+                            items: {
+                                type: "OBJECT",
+                                properties: {
+                                    term: { type: "STRING" },
+                                    meaning: { type: "STRING" },
+                                    desc: { type: "STRING" }
+                                },
+                                required: ["term", "meaning", "desc"]
+                            }
+                        }
+                    }
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                const jsonText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!jsonText) {
+                    throw new Error("AI 응답 데이터가 생성되지 않았습니다.");
+                }
+
+                const extractedList = JSON.parse(jsonText);
+                if (!Array.isArray(extractedList) || extractedList.length === 0) {
+                    showToast("⚠️ 사진에서 읽을 수 있는 영문 문장이나 단어를 찾지 못했습니다.");
+                    return;
+                }
+
+                let addedCount = 0;
+                extractedList.forEach(item => {
+                    const termTrimmed = (item.term || '').trim();
+                    if (!termTrimmed) return;
+
+                    const exists = devVocabulary.some(v => v.term.toLowerCase() === termTrimmed.toLowerCase());
+                    if (!exists) {
+                        const newEntry = {
+                            id: Date.now() + Math.floor(Math.random() * 100000),
+                            site: "캡처 추출",
+                            term: termTrimmed,
+                            meaning: item.meaning || termTrimmed,
+                            desc: item.desc || 'AI가 추출한 설명입니다.',
+                            isCustom: true
+                        };
+                        devVocabulary.unshift(newEntry);
+                        addedCount++;
+                    }
+                });
+
+                if (addedCount > 0) {
+                    localStorage.setItem('devvocab_custom_words', JSON.stringify(devVocabulary));
+                    remainingMeaningDeck = [];
+                    remainingVoiceDeck = [];
+                    renderVocabList();
+                    closeAddWordModal();
+                    playSound('complete');
+                    showToast(`✨ AI가 ${addedCount}개의 영문 문장 및 단어를 번역/설명과 함께 추가했습니다!`);
+                } else {
+                    showToast("이미 단어장에 등록되어 있는 항목들입니다.");
+                }
+
+            } catch (err) {
+                console.error(err);
+                showToast("❌ 이미지 분석 중 오류가 발생했습니다. 다시 시도해 주세요.");
+            } finally {
+                if (statusBox) statusBox.classList.add('hidden');
+                event.target.value = '';
+            }
+        }
+
+        function handleWordSubmit(e) {
+            e.preventDefault();
+            const site = document.getElementById('newWordSite').value;
+            const term = document.getElementById('newWordTerm').value.trim();
+            const meaning = document.getElementById('newWordMeaning').value.trim();
+            const desc = document.getElementById('newWordDesc').value.trim();
+
+            if(!term || !meaning) {
+                showToast("단어와 뜻을 입력해주세요.");
+                return;
+            }
+
+            const newWord = {
+                id: Date.now(),
+                site: site,
+                term: term,
+                meaning: meaning,
+                desc: desc || `${site} 사이트의 영단어입니다.`,
+                isCustom: true
+            };
+
+            devVocabulary.unshift(newWord);
+            localStorage.setItem('devvocab_custom_words', JSON.stringify(devVocabulary));
+
+            // Refresh decks for quizzes
+            remainingMeaningDeck = [];
+            remainingVoiceDeck = [];
+
+            document.getElementById('newWordTerm').value = '';
+            document.getElementById('newWordMeaning').value = '';
+            document.getElementById('newWordDesc').value = '';
+            closeAddWordModal();
+            renderVocabList();
+            playSound('complete');
+            showToast("새 단어가 성공적으로 추가되었습니다! ✨");
+        }
+
+        function deleteCustomWord(e, id) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (!confirm("이 단어/문장을 단어장에서 지우시겠습니까?")) return;
+            
+            devVocabulary = devVocabulary.filter(item => item.id !== id);
+            localStorage.setItem('devvocab_custom_words', JSON.stringify(devVocabulary));
+            
+            renderVocabList();
+            showToast("해당 항목이 정상 삭제되었습니다.");
+            playSound('click');
+        }
+
+        // --- BACKUP & RESTORE LOGIC ---
+        function openBackupRestoreModal() {
+            playSound('click');
+            document.getElementById('backupModal').classList.remove('hidden');
+        }
+
+        function closeBackupRestoreModal() {
+            document.getElementById('backupModal').classList.add('hidden');
+        }
+
+        function exportDataBackup() {
+            try {
+                const backupData = {
+                    version: 1,
+                    exportDate: new Date().toISOString(),
+                    devVocabulary: devVocabulary,
+                    completedDates: completedDates
+                };
+
+                const jsonStr = JSON.stringify(backupData, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const now = new Date();
+                const yy = String(now.getFullYear()).slice(-2);
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const dd = String(now.getDate()).padStart(2, '0');
+                const shortDateStr = `${yy}-${mm}-${dd}`;
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `english_${shortDateStr}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                playSound('complete');
+                showToast("단어장 데이터가 파일로 다운로드 되었습니다! 💾");
+            } catch (err) {
+                console.error(err);
+                showToast("백업 생성 중 오류가 발생했습니다.");
+            }
+        }
+
+        function importDataBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported && Array.isArray(imported.devVocabulary)) {
+                        devVocabulary = imported.devVocabulary;
+                        localStorage.setItem('devvocab_custom_words', JSON.stringify(devVocabulary));
+
+                        if (imported.completedDates && typeof imported.completedDates === 'object') {
+                            completedDates = imported.completedDates;
+                            localStorage.setItem('devvocab_completed_dates', JSON.stringify(completedDates));
+                        }
+
+                        renderVocabList();
+                        renderCalendar();
+                        updateStreakDisplay();
+                        closeBackupRestoreModal();
+                        playSound('complete');
+                        showToast(`데이터가 정상적으로 복구되었습니다! (${devVocabulary.length}개 항목) 🎉`);
+                    } else {
+                        showToast("올바르지 않은 백업 파일 형식입니다.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast("파일 복구 중 오류가 발생했습니다.");
+                } finally {
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- TAB 2: GAME & QUIZ LOGIC ---
+        function switchGameMode(mode) {
+            playSound('click');
+            currentGameMode = mode;
+            const meaningBtn = document.getElementById('modeMeaningBtn');
+            const voiceBtn = document.getElementById('modeVoiceBtn');
+            const meaningSec = document.getElementById('meaningGameSection');
+            const voiceSec = document.getElementById('voiceGameSection');
+
+            if (mode === 'meaning') {
+                meaningBtn.className = "py-2 text-xs font-bold rounded-lg transition-all bg-white text-brand-700 shadow-sm flex justify-center items-center gap-1";
+                voiceBtn.className = "py-2 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex justify-center items-center gap-1";
+                meaningSec.classList.remove('hidden');
+                voiceSec.classList.add('hidden');
+                loadMeaningQuiz();
+            } else {
+                voiceBtn.className = "py-2 text-xs font-bold rounded-lg transition-all bg-white text-brand-700 shadow-sm flex justify-center items-center gap-1";
+                meaningBtn.className = "py-2 text-xs font-bold rounded-lg transition-all text-slate-600 hover:text-slate-900 flex justify-center items-center gap-1";
+                voiceSec.classList.remove('hidden');
+                meaningSec.classList.add('hidden');
+                loadVoiceQuizWord();
+            }
+        }
+
+        function loadMeaningQuiz() {
+            if (devVocabulary.length === 0) return;
+
+            // Refill deck if empty so all words get tested exactly once per full round
+            if (remainingMeaningDeck.length === 0) {
+                remainingMeaningDeck = [...devVocabulary].sort(() => Math.random() - 0.5);
+                showToast("🎉 모든 단어를 1회독 완료했습니다! 새로운 라운드를 시작합니다.");
+            }
+
+            const target = remainingMeaningDeck.pop();
+            currentQuiz = target;
+
+            document.getElementById('remainingQuizCount').textContent = remainingMeaningDeck.length + 1;
+            document.getElementById('quizSiteBadge').textContent = target.site;
+            document.getElementById('quizWordTerm').textContent = target.term;
+
+            // Generate choices (1 correct, 3 distractors)
+            let options = [target.meaning];
+            while (options.length < 4 && options.length < devVocabulary.length) {
+                const randomItem = devVocabulary[Math.floor(Math.random() * devVocabulary.length)];
+                if (!options.includes(randomItem.meaning)) {
+                    options.push(randomItem.meaning);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const container = document.getElementById('quizOptionsContainer');
+            container.innerHTML = '';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "w-full py-3 px-4 bg-slate-50 hover:bg-brand-50 border border-slate-200 hover:border-brand-300 rounded-xl text-sm font-semibold text-slate-700 hover:text-brand-700 text-left transition flex justify-between items-center group";
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <i data-lucide="circle" class="w-4 h-4 text-slate-300 group-hover:text-brand-500"></i>
+                `;
+                btn.onclick = () => handleQuizOptionClick(opt, btn);
+                container.appendChild(btn);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Daily Mission Tracker Logic (Target: 30 words per day)
+        function trackMissionProgress() {
+            const todayStr = getFormattedDateStr(new Date());
+            let dailyProgress = JSON.parse(localStorage.getItem('devvocab_daily_progress') || '{}');
+            let todayCount = dailyProgress[todayStr] || 0;
+            const target = 30;
+            
+            if (todayCount < target) {
+                todayCount++;
+                dailyProgress[todayStr] = todayCount;
+                localStorage.setItem('devvocab_daily_progress', JSON.stringify(dailyProgress));
+                updateDailyMissionProgress();
+
+                if (todayCount === target) {
+                    playSound('complete');
+                    showToast("🎉 축하합니다! 오늘 미션 30개 암기를 달성했습니다!");
+                    completedDates[todayStr] = true;
+                    localStorage.setItem('devvocab_completed_dates', JSON.stringify(completedDates));
+                    renderCalendar();
+                    updateStreakDisplay();
+                }
+            }
+        }
+
+        function updateDailyMissionProgress() {
+            const todayStr = getFormattedDateStr(new Date());
+            let dailyProgress = JSON.parse(localStorage.getItem('devvocab_daily_progress') || '{}');
+            let todayCount = dailyProgress[todayStr] || 0;
+            const target = 30;
+            const percent = Math.min(100, Math.round((todayCount / target) * 100));
+
+            const badge = document.getElementById('missionBadge');
+            const fill = document.getElementById('missionProgressFill');
+            if (badge && fill) {
+                badge.textContent = `${todayCount} / ${target}개 (${percent}%)`;
+                fill.style.width = `${percent}%`;
+            }
+        }
+
+        function handleQuizOptionClick(selectedOpt, buttonEl) {
+            const isCorrect = (selectedOpt === currentQuiz.meaning);
+            const iconEl = buttonEl.querySelector('i') || buttonEl.querySelector('svg');
+
+            if (isCorrect) {
+                playSound('correct');
+                trackMissionProgress();
+                gameScore += 10;
+                document.getElementById('gameScore').textContent = gameScore;
+                buttonEl.className = "w-full py-3 px-4 bg-emerald-500 text-white border border-emerald-600 rounded-xl text-sm font-semibold text-left transition flex justify-between items-center";
+                if (iconEl) iconEl.outerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-white"></i>`;
+                lucide.createIcons();
+                showToast("정답입니다! +10점 🎉");
+                setTimeout(loadMeaningQuiz, 1200);
+            } else {
+                playSound('wrong');
+                buttonEl.className = "w-full py-3 px-4 bg-rose-500 text-white border border-rose-600 rounded-xl text-sm font-semibold text-left transition flex justify-between items-center";
+                if (iconEl) iconEl.outerHTML = `<i data-lucide="x-circle" class="w-5 h-5 text-white"></i>`;
+                lucide.createIcons();
+                showToast(`틀렸습니다! 정답: "${currentQuiz.meaning}"`);
+                setTimeout(loadMeaningQuiz, 1600);
+            }
+        }
+
+        function playQuizWordTTS() {
+            if (currentQuiz) speakTTS(currentQuiz.term);
+        }
+
+        // --- SPEECH RECOGNITION (STT) LOGIC ---
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    document.getElementById('micBtn').classList.add('pulse-mic', 'bg-rose-600');
+                    document.getElementById('speechResultText').textContent = "발음을 듣는 중입니다... 말씀하세요!";
+                    document.getElementById('speechResultText').className = "text-sm font-bold text-rose-600";
+                };
+
+                recognition.onresult = (e) => {
+                    const spoken = e.results[0][0].transcript.trim().toLowerCase();
+                    const target = voiceTarget.term.trim().toLowerCase();
+                    document.getElementById('speechRecognizedWord').textContent = `인식된 음성: "${e.results[0][0].transcript}"`;
+
+                    if (spoken.includes(target) || target.includes(spoken)) {
+                        playSound('correct');
+                        trackMissionProgress();
+                        gameScore += 15;
+                        document.getElementById('gameScore').textContent = gameScore;
+                        document.getElementById('speechResultText').textContent = "정확해요! 완벽한 발음입니다 🌟";
+                        document.getElementById('speechResultText').className = "text-sm font-bold text-emerald-600";
+                        setTimeout(loadVoiceQuizWord, 1500);
+                    } else {
+                        playSound('wrong');
+                        document.getElementById('speechResultText').textContent = "다시 시도해보세요!";
+                        document.getElementById('speechResultText').className = "text-sm font-bold text-amber-600";
+                    }
+                };
+
+                recognition.onerror = () => {
+                    document.getElementById('speechResultText').textContent = "음성이 정상적으로 인식되지 않았습니다.";
+                    document.getElementById('speechResultText').className = "text-sm font-semibold text-slate-500";
+                };
+
+                recognition.onend = () => {
+                    isListening = false;
+                    document.getElementById('micBtn').classList.remove('pulse-mic', 'bg-rose-600');
+                };
+            }
+        }
+
+        function loadVoiceQuizWord() {
+            if (devVocabulary.length === 0) return;
+
+            if (remainingVoiceDeck.length === 0) {
+                remainingVoiceDeck = [...devVocabulary].sort(() => Math.random() - 0.5);
+            }
+
+            voiceTarget = remainingVoiceDeck.pop();
+            document.getElementById('voiceSiteBadge').textContent = voiceTarget.site;
+            document.getElementById('voiceTargetWord').textContent = voiceTarget.term;
+            document.getElementById('speechResultText').textContent = "준비 완료. 마이크를 클릭하세요.";
+            document.getElementById('speechResultText').className = "text-sm font-semibold text-slate-600";
+            document.getElementById('speechRecognizedWord').textContent = "";
+        }
+
+        function toggleSpeechRecognition() {
+            if (!recognition) {
+                showToast("이 브라우저는 음성 인식을 지원하지 않습니다. Chrome을 권장합니다.");
+                return;
+            }
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        function playVoiceTargetTTS() {
+            if (voiceTarget) speakTTS(voiceTarget.term);
+        }
+
+        // --- TAB 3: CALENDAR & GOAL LOGIC ---
+        function renderCalendar() {
+            const year = calendarCurrentDate.getFullYear();
+            const month = calendarCurrentDate.getMonth();
+
+            document.getElementById('calendarMonthTitle').textContent = `${year}년 ${month + 1}월`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+
+            for (let i = 0; i < firstDayIndex; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+
+            const todayStr = getFormattedDateStr(new Date());
+
+            for (let day = 1; day <= lastDay; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isCompleted = !!completedDates[dateStr];
+                const isSelected = (dateStr === selectedDateStr);
+                const isToday = (dateStr === todayStr);
+
+                const dayBtn = document.createElement('button');
+                let dayClasses = "aspect-square rounded-xl flex flex-col justify-center items-center text-xs font-semibold transition-all relative border ";
+
+                if (isCompleted) {
+                    dayClasses += "bg-emerald-50 border-emerald-300 text-emerald-700 ";
+                } else {
+                    dayClasses += "bg-slate-50 border-slate-100 text-slate-700 hover:bg-slate-100 ";
+                }
+
+                if (isSelected) {
+                    dayClasses += "ring-2 ring-brand-500 font-bold ";
+                }
+
+                dayBtn.className = dayClasses;
+                dayBtn.innerHTML = `
+                    <span>${day}</span>
+                    ${isCompleted ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-0.5"></span>' : ''}
+                    ${isToday ? '<span class="absolute top-1 right-1 text-[8px] font-black text-brand-600">●</span>' : ''}
+                `;
+                dayBtn.onclick = () => selectCalendarDate(dateStr);
+                grid.appendChild(dayBtn);
+            }
+
+            updateSelectedDateView();
+        }
+
+        function changeMonth(delta) {
+            playSound('click');
+            calendarCurrentDate.setMonth(calendarCurrentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function selectCalendarDate(dateStr) {
+            playSound('click');
+            selectedDateStr = dateStr;
+            renderCalendar();
+        }
+
+        function updateSelectedDateView() {
+            const isCompleted = !!completedDates[selectedDateStr];
+            document.getElementById('selectedDateTitle').textContent = selectedDateStr;
+
+            const badge = document.getElementById('goalBadge');
+            const percentText = document.getElementById('goalPercentText');
+            const fill = document.getElementById('dailyProgressFill');
+            const btn = document.getElementById('toggleGoalBtn');
+
+            if (isCompleted) {
+                badge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200";
+                badge.textContent = "달성 완료! 🎉";
+                percentText.textContent = "100%";
+                fill.style.width = "100%";
+                btn.className = "w-full py-2.5 rounded-xl font-bold text-sm bg-slate-200 text-slate-600 hover:bg-slate-300 transition active:scale-[0.99] flex justify-center items-center gap-2";
+                btn.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4"></i> 완료 취소하기`;
+            } else {
+                badge.className = "text-xs font-bold px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200";
+                badge.textContent = "진행 중 ⏳";
+                percentText.textContent = "0%";
+                fill.style.width = "0%";
+                btn.className = "w-full py-2.5 rounded-xl font-bold text-sm bg-brand-600 hover:bg-brand-700 text-white shadow-sm transition active:scale-[0.99] flex justify-center items-center gap-2";
+                btn.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4"></i> 오늘 목표 달성 완료 체크`;
+            }
+            lucide.createIcons();
+        }
+
+        function toggleDateGoal() {
+            const isCompleted = !!completedDates[selectedDateStr];
+            if (isCompleted) {
+                delete completedDates[selectedDateStr];
+                showToast("목표 달성이 취소되었습니다.");
+            } else {
+                completedDates[selectedDateStr] = true;
+                playSound('complete');
+                showToast(`${selectedDateStr} 학습 목표를 완료했습니다! 🌟`);
+            }
+            localStorage.setItem('devvocab_completed_dates', JSON.stringify(completedDates));
+            renderCalendar();
+            updateStreakDisplay();
+        }
+
+        function updateStreakDisplay() {
+            let streak = 0;
+            let checkDate = new Date();
+            while (true) {
+                const dateStr = getFormattedDateStr(checkDate);
+                if (completedDates[dateStr]) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            document.getElementById('streakCount').textContent = `${streak}일 연속`;
+        }
+    </script>
+</body>
+</html>
